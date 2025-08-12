@@ -1,0 +1,35 @@
+# Phenix Rhyder/ Checkerboard Pattern
+name: Deploy Python App to Hugging Face Spaces
+
+# This action will trigger on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+# A workflow run is made up of one or more jobs
+jobs:
+  # This job syncs your repository content to a Hugging Face Space
+  deploy-to-hub:
+    # Use the latest version of Ubuntu as the operating system
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the repository's code so the workflow can access it.
+      # We are now fetching the full history because it is clean.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Using 0 fetches all history, which is correct now.
+          lfs: true
+
+      # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
+      - name: Push to Hugging Face Hub
+        env:
+          # Your Hugging Face token, stored as a secret
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # This command adds your Hugging Face Space as a new remote destination.
+          git remote add space https://user:${HF_TOKEN}@huggingface.co/spaces/phenixrhyder/Checkerboard_Pattern
+          
+          # This command force-pushes the 'main' branch of your GitHub repo to the 'main' branch of the Space.
+          git push --force space main
