@@ -1,7 +1,9 @@
+---
 title: Checkerboard Pattern Generator
 sdk: gradio
 app_file: app.py
-Checkerboard Pattern Generator
+---
+
 Welcome to the Checkerboard Pattern Generator! This is a simple and interactive Hugging Face Space that allows you to create custom checkerboard images directly in your browser.
 🚀 How to Use
 Using the app is straightforward:
