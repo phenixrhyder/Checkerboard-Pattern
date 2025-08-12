@@ -2,7 +2,7 @@
 title: Checkerboard Pattern Generator
 emoji: '🏁'
 colorFrom: 'gray'
-colorTo: 'black'
+colorTo: 'gray'
 sdk: gradio
 sdk_version: "4.21.0"
 app_file: app.py
