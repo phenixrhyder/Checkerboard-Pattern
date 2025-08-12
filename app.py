@@ -2,15 +2,23 @@
 
 import gradio as gr
 from PIL import Image, ImageDraw
-import tempfile # Needed to create a temporary file for downloading
+import tempfile
 
-def create_checkerboard(board_size, square_size, color1, color2):
+# Define a dictionary of preset canvas sizes (width, height)
+PRESET_SIZES = {
+    "Square (1:1)": (1080, 1080),
+    "Classic TV (4:3)": (1200, 900),
+    "Widescreen (16:9)": (1920, 1080),
+    "Tumblr Header": (3000, 1055),
+}
+
+def create_checkerboard(preset_name, square_size, color1, color2):
     """
-    Generates a checkerboard image using the Pillow library with custom colors.
+    Generates a checkerboard image by filling a preset canvas with perfect squares.
 
     Args:
-        board_size (int): The number of squares per side.
-        square_size (int): The size of each square in pixels.
+        preset_name (str): The key for the PRESET_SIZES dictionary.
+        square_size (int): The width and height of each perfect square in pixels.
         color1 (str): The name of the first color.
         color2 (str): The name of the second color.
 
@@ -18,28 +26,28 @@ def create_checkerboard(board_size, square_size, color1, color2):
         (PIL.Image.Image, str): A tuple containing the generated image 
                                 and the path to a temporary file for download.
     """
-    # Calculate the total size of the image
-    image_size = board_size * square_size
-    
+    # Get the image dimensions from the selected preset
+    image_width, image_height = PRESET_SIZES[preset_name]
+
+    # Calculate how many squares will fit in the canvas
+    board_size_w = int(image_width / square_size) + 1
+    board_size_h = int(image_height / square_size) + 1
+
     # Create a new blank image in RGBA mode to support transparency
-    # The background is now transparent (0,0,0,0)
-    image = Image.new("RGBA", (image_size, image_size), (0, 0, 0, 0))
+    image = Image.new("RGBA", (image_width, image_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
 
     # Loop through each square position
-    for row in range(board_size):
-        for col in range(board_size):
+    for row in range(board_size_h):
+        for col in range(board_size_w):
             # Determine which color string to use for the current square
             if (row + col) % 2 == 0:
                 color_name = color1
             else:
                 color_name = color2
             
-            # Use a transparent tuple if "Transparent" is selected, otherwise use the color name
-            if color_name == "Transparent":
-                square_color = (0, 0, 0, 0)
-            else:
-                square_color = color_name
+            # Use a transparent tuple if "Transparent" is selected
+            square_color = (0, 0, 0, 0) if color_name == "Transparent" else color_name
 
             # Calculate the coordinates of the square
             x1 = col * square_size
@@ -47,7 +55,7 @@ def create_checkerboard(board_size, square_size, color1, color2):
             x2 = x1 + square_size
             y2 = y1 + square_size
             
-            # Draw the rectangle
+            # Draw the rectangle (which is now always a square)
             draw.rectangle([x1, y1, x2, y2], fill=square_color)
 
     # Save the image to a temporary file to make it downloadable
@@ -60,37 +68,42 @@ def create_checkerboard(board_size, square_size, color1, color2):
 # --- Create the Gradio Interface ---
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown("# Checkerboard Pattern Generator")
-    gr.Markdown("Use the sliders and dropdowns to customize your pattern, then click Generate.")
+    gr.Markdown("Select a preset canvas size, the size of the squares, and colors, then click Generate.")
 
     with gr.Row():
-        # Input sliders for customization
-        board_size_slider = gr.Slider(minimum=2, maximum=20, value=8, step=1, label="Board Size (e.g., 8x8)")
-        square_size_slider = gr.Slider(minimum=10, maximum=100, value=50, step=5, label="Square Size (pixels)")
+        # Dropdown for preset sizes
+        preset_dropdown = gr.Dropdown(
+            choices=list(PRESET_SIZES.keys()), 
+            value="Square (1:1)", 
+            label="Canvas Size Preset"
+        )
+        # CHANGED: Slider now controls the size of each square
+        square_size_slider = gr.Slider(
+            minimum=10, 
+            maximum=200, 
+            value=50, 
+            step=1, 
+            label="Square Size (pixels)"
+        )
 
-    # Define a list of standard colors, now including Transparent
-    color_choices = ["Transparent", "White", "Black", "Gray", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Magenta"]
+    # Define a list of standard colors, including Transparent
+    color_choices = ["Transparent", "White", "Black", "Gray", "Red", "Green", "Blue", "Yellow", "Purple", "Orange"]
 
     with gr.Row():
-        # Dropdowns now include and default to Transparent
+        # Color dropdowns remain the same
         dropdown_1 = gr.Dropdown(choices=color_choices, value="Transparent", label="Color 1")
         dropdown_2 = gr.Dropdown(choices=color_choices, value="Black", label="Color 2")
 
-    # The button to trigger the image generation
     generate_button = gr.Button("Generate Image")
-
-    # The output component to display the generated image
     output_image = gr.Image(label="Generated Checkerboard")
-    
-    # The file component for the download button
     download_button = gr.File(label="Download Image as PNG")
 
-    # Link the button to the function
+    # Link the button to the function with the new inputs
     generate_button.click(
         fn=create_checkerboard,
-        inputs=[board_size_slider, square_size_slider, dropdown_1, dropdown_2],
+        inputs=[preset_dropdown, square_size_slider, dropdown_1, dropdown_2],
         outputs=[output_image, download_button]
     )
 
-# --- Launch the App ---
 if __name__ == "__main__":
     demo.launch()
