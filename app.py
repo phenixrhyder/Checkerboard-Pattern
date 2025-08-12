@@ -11,8 +11,8 @@ def create_checkerboard(board_size, square_size, color1, color2):
     Args:
         board_size (int): The number of squares per side.
         square_size (int): The size of each square in pixels.
-        color1 (str): The hex code for the first color.
-        color2 (str): The hex code for the second color.
+        color1 (str): The name or hex code for the first color.
+        color2 (str): The name or hex code for the second color.
 
     Returns:
         (PIL.Image.Image, str): A tuple containing the generated image 
@@ -53,17 +53,20 @@ def create_checkerboard(board_size, square_size, color1, color2):
 # --- Create the Gradio Interface ---
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown("# Checkerboard Pattern Generator")
-    gr.Markdown("Use the sliders and color pickers to customize your pattern, then click Generate.")
+    gr.Markdown("Use the sliders and dropdowns to customize your pattern, then click Generate.")
 
     with gr.Row():
         # Input sliders for customization
         board_size_slider = gr.Slider(minimum=2, maximum=20, value=8, step=1, label="Board Size (e.g., 8x8)")
         square_size_slider = gr.Slider(minimum=10, maximum=100, value=50, step=5, label="Square Size (pixels)")
 
+    # Define a list of standard colors for the dropdowns
+    color_choices = ["White", "Black", "Gray", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Magenta"]
+
     with gr.Row():
-        # NEW: Color pickers for the two board colors
-        color_picker_1 = gr.ColorPicker(value="#FFFFFF", label="Color 1 (Light)")
-        color_picker_2 = gr.ColorPicker(value="#000000", label="Color 2 (Dark)")
+        # CHANGED: Replaced ColorPickers with Dropdowns for reliability
+        dropdown_1 = gr.Dropdown(choices=color_choices, value="White", label="Color 1 (Light)")
+        dropdown_2 = gr.Dropdown(choices=color_choices, value="Black", label="Color 2 (Dark)")
 
     # The button to trigger the image generation
     generate_button = gr.Button("Generate Image")
@@ -71,14 +74,14 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     # The output component to display the generated image
     output_image = gr.Image(label="Generated Checkerboard")
     
-    # NEW: The file component for the download button
+    # The file component for the download button
     download_button = gr.File(label="Download Image as PNG")
 
     # Link the button to the function
     generate_button.click(
         fn=create_checkerboard,
-        inputs=[board_size_slider, square_size_slider, color_picker_1, color_picker_2],
-        outputs=[output_image, download_button] # We now have two outputs
+        inputs=[board_size_slider, square_size_slider, dropdown_1, dropdown_2], # Using dropdowns as inputs now
+        outputs=[output_image, download_button]
     )
 
 # --- Launch the App ---
