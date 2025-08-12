@@ -11,8 +11,8 @@ def create_checkerboard(board_size, square_size, color1, color2):
     Args:
         board_size (int): The number of squares per side.
         square_size (int): The size of each square in pixels.
-        color1 (str): The name or hex code for the first color.
-        color2 (str): The name or hex code for the second color.
+        color1 (str): The name of the first color.
+        color2 (str): The name of the second color.
 
     Returns:
         (PIL.Image.Image, str): A tuple containing the generated image 
@@ -21,24 +21,31 @@ def create_checkerboard(board_size, square_size, color1, color2):
     # Calculate the total size of the image
     image_size = board_size * square_size
     
-    # Create a new blank image
-    image = Image.new("RGB", (image_size, image_size), "white")
+    # Create a new blank image in RGBA mode to support transparency
+    # The background is now transparent (0,0,0,0)
+    image = Image.new("RGBA", (image_size, image_size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
 
     # Loop through each square position
     for row in range(board_size):
         for col in range(board_size):
+            # Determine which color string to use for the current square
+            if (row + col) % 2 == 0:
+                color_name = color1
+            else:
+                color_name = color2
+            
+            # Use a transparent tuple if "Transparent" is selected, otherwise use the color name
+            if color_name == "Transparent":
+                square_color = (0, 0, 0, 0)
+            else:
+                square_color = color_name
+
             # Calculate the coordinates of the square
             x1 = col * square_size
             y1 = row * square_size
             x2 = x1 + square_size
             y2 = y1 + square_size
-
-            # Determine the color of the square
-            if (row + col) % 2 == 0:
-                square_color = color1
-            else:
-                square_color = color2
             
             # Draw the rectangle
             draw.rectangle([x1, y1, x2, y2], fill=square_color)
@@ -60,13 +67,13 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
         board_size_slider = gr.Slider(minimum=2, maximum=20, value=8, step=1, label="Board Size (e.g., 8x8)")
         square_size_slider = gr.Slider(minimum=10, maximum=100, value=50, step=5, label="Square Size (pixels)")
 
-    # Define a list of standard colors for the dropdowns
-    color_choices = ["White", "Black", "Gray", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Magenta"]
+    # Define a list of standard colors, now including Transparent
+    color_choices = ["Transparent", "White", "Black", "Gray", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Cyan", "Magenta"]
 
     with gr.Row():
-        # CHANGED: Replaced ColorPickers with Dropdowns for reliability
-        dropdown_1 = gr.Dropdown(choices=color_choices, value="White", label="Color 1 (Light)")
-        dropdown_2 = gr.Dropdown(choices=color_choices, value="Black", label="Color 2 (Dark)")
+        # Dropdowns now include and default to Transparent
+        dropdown_1 = gr.Dropdown(choices=color_choices, value="Transparent", label="Color 1")
+        dropdown_2 = gr.Dropdown(choices=color_choices, value="Black", label="Color 2")
 
     # The button to trigger the image generation
     generate_button = gr.Button("Generate Image")
@@ -80,7 +87,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     # Link the button to the function
     generate_button.click(
         fn=create_checkerboard,
-        inputs=[board_size_slider, square_size_slider, dropdown_1, dropdown_2], # Using dropdowns as inputs now
+        inputs=[board_size_slider, square_size_slider, dropdown_1, dropdown_2],
         outputs=[output_image, download_button]
     )
 
