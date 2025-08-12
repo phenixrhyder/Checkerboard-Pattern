@@ -1,4 +1,3 @@
----
 title: Checkerboard Pattern Generator
 colorFrom: 'gray'
 colorTo: 'gray'
@@ -7,7 +6,6 @@ sdk_version: "4.21.0"
 python_version: "3.10"
 app_file: app.py
 short_description: "An interactive tool to generate custom checkerboard patterns."
-tags: [image-generation, drawing, gradio, creative-tool]
 Checkerboard Pattern Generator
 Welcome to the Checkerboard Pattern Generator! This is a simple and interactive Hugging Face Space that allows you to create custom checkerboard images directly in your browser.
 🚀 How to Use
@@ -21,4 +19,3 @@ This application is built using the following open-source libraries:
  * Gradio: Provides the fast and easy-to-use web interface with sliders, buttons, and image display components.
  * Pillow (PIL): The core image processing library used to draw the checkerboard pattern on a blank canvas.
 The entire application is contained within the app.py file and runs on the Hugging Face Spaces infrastructure.
----
