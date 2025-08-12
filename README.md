@@ -1,13 +1,8 @@
+---
 title: Checkerboard Pattern Generator
-emoji: '🏁'
-colorFrom: 'gray'
-colorTo: 'gray'
 sdk: gradio
-sdk_version: "4.21.0"
 app_file: app.py
-short_description: "An interactive tool to generate custom checkerboard patterns."
-tags: ["image-generation", "drawing", "gradio", "creative-tool"]
-Checkerboard Pattern Generator
+---
 Welcome to the Checkerboard Pattern Generator! This is a simple and interactive Hugging Face Space that allows you to create custom checkerboard images directly in your browser.
 🚀 How to Use
 Using the app is straightforward:
