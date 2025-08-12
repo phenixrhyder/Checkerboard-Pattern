@@ -1,3 +1,4 @@
+---
 title: Checkerboard Pattern Generator
 colorFrom: 'gray'
 colorTo: 'gray'
@@ -6,6 +7,7 @@ sdk_version: "4.21.0"
 python_version: "3.10"
 app_file: app.py
 short_description: "An interactive tool to generate custom checkerboard patterns."
+---
 Checkerboard Pattern Generator
 Welcome to the Checkerboard Pattern Generator! This is a simple and interactive Hugging Face Space that allows you to create custom checkerboard images directly in your browser.
 🚀 How to Use
